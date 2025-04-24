@@ -1,31 +1,38 @@
 const mongoose = require('mongoose');
-const database_Url =`mongodb://localhost:27017/todolist`
+
+const DATABASE_URL = 'mongodb://localhost:27017/todolist';
+
 const connectDB = async () => {
     try {
-        console.log('MongoDB URI:', database_Url);
-        await mongoose.connect(database_Url, {
+        console.log(`MongoDB URI: ${DATABASE_URL}`);
+        
+        await mongoose.connect(DATABASE_URL, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 5000, // Timeout for server selection
-            connectTimeoutMS: 10000, // Connection timeout
-            socketTimeoutMS: 45000, // Socket timeout
-            family: 4, // Use IPv4
+            serverSelectionTimeoutMS: 5000,
+            connectTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+            family: 4,
         });
+
         console.log('MongoDB connected successfully');
+
         mongoose.connection.on('error', (err) => {
             console.error('MongoDB connection error:', err);
         });
+
         mongoose.connection.on('disconnected', () => {
-            console.warn('MongoDB disconnected. Attempting to reconnect...');
-            setTimeout(connectDB, 5000); // Retry after 5s
+            console.warn('MongoDB disconnected. Reconnecting in 5 seconds...');
+            setTimeout(connectDB, 5000);
         });
-    } catch (err) {
-        console.error('MongoDB connection failed:', err.message);
+
+    } catch (error) {
+        console.error('MongoDB connection failed:', error.message);
         process.exit(1);
     }
 };
 
-// Connect on server start
+// Initialize connection
 connectDB();
 
 module.exports = mongoose;
